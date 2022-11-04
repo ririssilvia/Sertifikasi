@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sertifikasi/pages/dashboard.dart';
@@ -13,13 +14,14 @@ class HomePage extends StatelessWidget {
 
   List data = [
     dataBody(dataUser: Get.arguments),
-    DashboardScrenn(dataUser: Get.arguments),
+    Dashboard(dataUser: Get.arguments),
     ProfileDart(dataUser: Get.arguments),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 112, 178, 231),
       appBar: AppBar(
         title: Text('Home Page'),
         actions: [
@@ -75,16 +77,24 @@ class dataBody extends StatelessWidget {
             ),
             child: Text(
               "Hallo, ${dataUser[0]['nama_lengkap']}",
-             textAlign: TextAlign.center,
+            textAlign: TextAlign.center,
               style: GoogleFonts.poppins().copyWith(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
-          ),
+          )
         ),
-         Padding(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SvgPicture.asset(
+              'assets/sukses.svg',
+              height: 200,
+              width: 200,
+            ),
+        ),
+        Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
             height: 40,
@@ -100,7 +110,7 @@ class dataBody extends StatelessWidget {
                 )
               ],
             ),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 10, bottom: 20),
+            margin: EdgeInsets.only(top: 20, left: 20, right: 10, bottom: 5),
             child: Text(
               "Username : ${dataUser[0]['username']}",
               textAlign: TextAlign.center,
@@ -128,7 +138,7 @@ class dataBody extends StatelessWidget {
                 )
               ],
             ),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 10, bottom: 20),
+            margin: EdgeInsets.only(top:5 , left: 20, right: 10, bottom: 2),
             child: Text(
               "Password ${dataUser[0]['password']}",
               textAlign: TextAlign.center,
@@ -156,7 +166,7 @@ class dataBody extends StatelessWidget {
                 )
               ],
             ),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 10, bottom: 20),
+            margin: EdgeInsets.only(top: 5, left: 20, right: 10, bottom: 2),
             child: Text(
               "nama lengkap : ${dataUser[0]['nama_lengkap']}",
               textAlign: TextAlign.center,
@@ -184,7 +194,7 @@ class dataBody extends StatelessWidget {
                 )
               ],
             ),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 10, bottom: 20),
+            margin: EdgeInsets.only(top: 5, left: 20, right: 10, bottom: 2),
             child: Text(
               "No Hp : ${dataUser[0]['noHp']}",
               textAlign: TextAlign.center,

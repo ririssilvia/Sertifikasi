@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                   fontSize: 40,
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold),
             ),
             Text(
@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                   fontSize: 15,
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold),
             ),
             SvgPicture.asset(
@@ -173,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
               width: 200,
               height: 40,
               child: TextButton(
-                   onPressed: () async {
+                  onPressed: () async {
                       // succes
                       List<Map<String, Object?>> result = await loginC.login();
                       if (result.length != 0) {

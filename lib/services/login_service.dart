@@ -4,6 +4,7 @@ import 'package:sertifikasi/database/sqlhelper.dart';
 import 'package:sertifikasi/model/user.dart';
 
 class LoginService {
+  //proses login untuk mencocokan data 
   static login(UserModel userModel) async {
     var data = await SqlHelper.findByUsername(userModel);
 

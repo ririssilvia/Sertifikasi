@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:map_launcher/map_launcher.dart';
-import 'package:sertifikasi/controllers/location_controller.dart';
+import "package:flutter/material.dart";
+import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
-class DashboardScrenn extends StatelessWidget {
-  const DashboardScrenn({
+class Dashboard extends StatefulWidget {
+    const Dashboard({
     Key? key,
     required this.dataUser,
   }) : super(key: key);
@@ -12,113 +14,151 @@ class DashboardScrenn extends StatelessWidget {
   final dataUser;
 
   @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  double latitude = 0;
+  double longitude = 0;
+  String location = 'Belum Mendapatkan Lat dan long, Silahkan tekan button';
+  String address = 'Mencari lokasi...';
+  //getLongLAT
+  Future<Position> _getGeoLocationPosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    //location service not enabled, don't continue
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return Future.error('Location service Not Enabled');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permission denied');
+      }
+    }
+    //Jika permission tidak diizinkan secara terus menerus
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+        'Location permission denied forever, we cannot access',
+      );
+    }
+    //continue accessing the position of device
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+
+  // Get Adrress
+  Future<void> getAddressFromLongLat(Position position) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemarks[0];
+    if (mounted) {
+      setState(() {
+        address =
+            '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+      });
+    }
+  }
+
+  setLocation() async {
+    Position position = await _getGeoLocationPosition();
+    if (mounted) {
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+        location = '${position.latitude}, ${position.longitude}';
+      });
+    }
+    getAddressFromLongLat(position);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Container(
-            child: Text(
-              "Location",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+    setLocation();
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 112, 178, 231),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(25),
+          child: ListView(
+            children: [
+              const SizedBox(
+                height: 10.0,
+              ),
+              SvgPicture.asset(
+                'assets/lokasi.svg',
+                height: 200,
+                width: 200,
+              ),
+              Text(
+                'Koordinat Point',
+                textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                  fontSize: 35,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
             ),
+              const SizedBox(
+                height: 10.0,
+              ),
+              //menamilkan kordinat Lokasi
+              Text(
+                location,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+              const SizedBox(
+                height: 20.0,
+              ),
+              Text(
+                'Lokasi',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 35,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
+            
+              const SizedBox(
+                height: 15.0,
+              ),
+              //menampilkan alamat
+              Text(
+                address,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+              
+              const SizedBox(
+                height: 25.0,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  MapsLauncher.launchCoordinates(latitude, longitude);
+                },
+                style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(255, 15, 98, 167),
+                      onPrimary: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                    ),
+                child: const Text('Tampilkan Pada Map'),
+              ),
+            ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Container(
-            height: 300,
-            width: double.infinity,
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [
-              BoxShadow(
-                  color: Colors.black26, offset: Offset.fromDirection(1, 2))
-            ]),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Kordinat',
-                    style: TextStyle(
-                      fontSize: 25,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Obx(
-                  () => Text(
-                    'long : ${Get.find<LocationController>().myPosition.value.longitude}    lat : ${Get.find<LocationController>().myPosition.value.latitude}',
-                    style: TextStyle(
-                      fontSize: 25,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Center(
-                  child: Text(
-                    'Address ',
-                    style: TextStyle(
-                      fontSize: 25,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Center(
-                    child: Obx(
-                  () => Text(
-                    Get.find<LocationController>().address.value == ""
-                        ? "Get Kordinat dulu"
-                        : Get.find<LocationController>().address.value,
-                    style: TextStyle(
-                      fontSize: 25,
-                    ),
-                  ),
-                )),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          // get kordinat
-                          final conC = Get.find<LocationController>();
-                          conC.getLokasi();
-                          conC.update();
-                        },
-                        child: Text('Get Kordinat')),
-                    ElevatedButton(
-                        onPressed: () async {
-                          // get adress
-                          var lat = Get.find<LocationController>()
-                              .myPosition
-                              .value
-                              .latitude;
-                          var long = Get.find<LocationController>()
-                              .myPosition
-                              .value
-                              .longitude;
-                          final availableMaps = await MapLauncher.installedMaps;
-                          await availableMaps.first.showMarker(
-                            coords: Coords(lat, long),
-                            title: "Lokasi TSA",
-                          );
-                        },
-                        child: Text('Get Maps'))
-                  ],
-                )
-              ],
-            ),
-          ),
-        )
-      ],
+      ),
     );
   }
 }
